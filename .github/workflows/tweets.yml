@@ -16,8 +16,8 @@ jobs:
       - run: yarn install
       - run: yarn tweets
         env:
-          TWITTER_KEY: ${{ secrets.TWITTER_KEY }}
-          TWITTER_SECRET: ${{ secrets.TWITTER_SECRET }}
-          TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
-          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          CONSUMER_KEY: ${{ secrets.TWITTER_KEY }}          
+          CONSUMER_SECRET: ${{ secrets.TWITTER_SECRET }}       
+          ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }} 
+          ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
           DELETE_AFTER_DAYS: ${{ secrets.DELETE_AFTER_DAYS }}

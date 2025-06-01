@@ -10,14 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: yarn install
-      - run: yarn tweets
+          cache: 'yarn'
+          
+      - name: Install dependencies
+        run: yarn install
+        
+      - name: Verify environment
+        run: |
+          echo "CONSUMER_KEY length: ${#CONSUMER_KEY}"
+          echo "ACCESS_TOKEN length: ${#ACCESS_TOKEN}"
+          
+      - name: Run cleanup
         env:
-          CONSUMER_KEY: ${{ secrets.TWITTER_KEY }}          
-          CONSUMER_SECRET: ${{ secrets.TWITTER_SECRET }}       
-          ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }} 
-          ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
           DELETE_AFTER_DAYS: ${{ secrets.DELETE_AFTER_DAYS }}
+        run: yarn tweets

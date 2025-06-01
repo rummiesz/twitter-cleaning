@@ -27,4 +27,8 @@ async function deleteAllTweets() {
     console.log("İşlem tamamlandı. Birden fazla kez çalıştırarak daha fazla tweet silebilirsin.");
 
   } catch (error) {
-    console.error("Hata:"
+    console.error("Hata:", error);
+  }
+}
+
+deleteAllTweets();

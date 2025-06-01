@@ -1,4 +1,4 @@
-const Twitter = require('twitter-lite');
+const Twitter = require("twitter-lite");
 
 const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,
@@ -7,26 +7,24 @@ const client = new Twitter({
   access_token_secret: process.env.ACCESS_TOKEN_SECRET,
 });
 
-const DAYS_LIMIT = 14;
-const cutoffDate = new Date(Date.now() - DAYS_LIMIT * 24 * 60 * 60 * 1000);
-
-async function deleteOldTweets() {
+async function deleteAllTweets() {
   try {
     const tweets = await client.get("statuses/user_timeline", {
       count: 200,
       trim_user: true,
     });
 
-    for (let tweet of tweets) {
-      const tweetDate = new Date(tweet.created_at);
-      if (tweetDate < cutoffDate) {
-        console.log(`Deleting tweet from ${tweetDate}: ${tweet.text}`);
-        await client.post(`statuses/destroy/${tweet.id_str}`, {});
-      }
+    if (tweets.length === 0) {
+      console.log("Silinecek tweet yok.");
+      return;
     }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
 
-deleteOldTweets();
+    for (const tweet of tweets) {
+      console.log(`Siliniyor: ${tweet.created_at} - ${tweet.text}`);
+      await client.post(`statuses/destroy/${tweet.id_str}`, {});
+    }
+
+    console.log("İşlem tamamlandı. Birden fazla kez çalıştırarak daha fazla tweet silebilirsin.");
+
+  } catch (error) {
+    console.error("Hata:"

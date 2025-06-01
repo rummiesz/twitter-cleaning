@@ -33,3 +33,31 @@ jobs:
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
           DELETE_AFTER_DAYS: ${{ secrets.DELETE_AFTER_DAYS }}
         run: yarn tweets
+        const { twitter } = require('./config');
+
+async function main() {
+  try {
+    // Önce API bağlantısını test edelim
+    const user = await twitter.v2.me();
+    console.log(`Kullanıcı ${user.data.name} için işlem başlıyor...`);
+
+    const { data: tweets } = await twitter.v2.userTimeline(user.data.id, {
+      max_results: 100,
+      'tweet.fields': 'created_at'
+    });
+
+    for (const tweet of tweets) {
+      try {
+        await twitter.v1.deleteTweet(tweet.id);
+        console.log(`Silindi: ${tweet.id}`);
+      } catch (err) {
+        console.error(`Hata (${tweet.id}):`, err.message);
+      }
+    }
+  } catch (err) {
+    console.error('Kritik Hata:', err);
+    process.exit(1); // Hata durumunda script dursun
+  }
+}
+
+main();

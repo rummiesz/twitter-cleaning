@@ -1,4 +1,4 @@
-const Twitter = require("twitter-lite");
+const Twitter = require("twitter-api-v2");
 
 const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,

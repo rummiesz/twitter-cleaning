@@ -1,28 +1,27 @@
-name: Twitter Cleaning
+name: Run Twitter Cleaner
 
 on:
-  workflow_dispatch: # Manuel çalıştırmak için
+  workflow_dispatch:
 
 jobs:
-  delete_old_tweets:
+  run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'  # veya 16/20, sana bağlı
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run cleaning script
+      - name: Run script
         env:
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
           ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
         run: node index.js

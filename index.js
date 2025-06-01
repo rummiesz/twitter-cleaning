@@ -1,34 +1,50 @@
-const Twitter = require("twitter-api-v2");
+const { TwitterApi } = require('twitter-api-v2');
+const dotenv = require('dotenv');
 
-const client = new Twitter({
-  consumer_key: process.env.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET,
-  access_token_key: process.env.ACCESS_TOKEN_KEY,
-  access_token_secret: process.env.ACCESS_TOKEN_SECRET,
+dotenv.config();
+
+// Twitter client oluşturma
+const client = new TwitterApi({
+  appKey: process.env.CONSUMER_KEY,
+  appSecret: process.env.CONSUMER_SECRET,
+  accessToken: process.env.ACCESS_TOKEN,
+  accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
 });
 
-async function deleteAllTweets() {
+// Tweet silme fonksiyonu
+const deleteAllTweets = async () => {
   try {
-    const tweets = await client.get("statuses/user_timeline", {
-      count: 200,
-      trim_user: true,
-    });
+    const user = await client.v2.me();
+    let nextToken;
+    let deletedCount = 0;
 
-    if (tweets.length === 0) {
-      console.log("Silinecek tweet yok.");
-      return;
-    }
+    do {
+      const { data, meta } = await client.v2.userTimeline(user.data.id, {
+        max_results: 100,
+        pagination_token: nextToken,
+        'tweet.fields': 'created_at'
+      });
 
-    for (const tweet of tweets) {
-      console.log(`Siliniyor: ${tweet.created_at} - ${tweet.text}`);
-      await client.post(`statuses/destroy/${tweet.id_str}`, {});
-    }
+      for (const tweet of data) {
+        try {
+          await client.v1.deleteTweet(tweet.id);
+          console.log(`Silindi: ${tweet.id}`);
+          deletedCount++;
+          
+          // Rate limit koruması (3 saniye bekle)
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        } catch (err) {
+          console.error(`Hata (${tweet.id}):`, err.message);
+        }
+      }
 
-    console.log("İşlem tamamlandı. Birden fazla kez çalıştırarak daha fazla tweet silebilirsin.");
+      nextToken = meta?.next_token;
+    } while (nextToken);
 
-  } catch (error) {
-    console.error("Hata:", error);
+    console.log(`Toplam ${deletedCount} tweet silindi!`);
+  } catch (err) {
+    console.error('Ana hata:', err);
   }
-}
+};
 
 deleteAllTweets();
